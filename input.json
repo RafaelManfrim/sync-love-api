@@ -429,6 +429,51 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "date": "2024-09-21",
+      "items": [
+        {
+          "name": "Coca Cola Sem Açucar Retornável 2L",
+          "price": 6.99,
+          "quantity": 2
+        },
+        {
+          "name": "Alcool em Gel Tupi 70% 440g",
+          "price": 10.99,
+          "quantity": 1
+        },
+        {
+          "name": "Queijo Azul Tirolez",
+          "price": 98.90,
+          "amount": 0.190
+        },
+        {
+          "name": "Agua Com Gás Crystal 1,5L",
+          "price": 3.69,
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "date": "2024-09-07",
+      "items": [
+        {
+          "name": "Alcatra Bovino",
+          "price": 31.50,
+          "amount": 0.954
+        },
+        {
+          "name": "Macarrão Basilar Semolado Parafuso",
+          "price": 2.98,
+          "quantity": 2
+        },
+        {
+          "name": "Coca Zero 2L",
+          "price": 8.99,
+          "quantity": 1
+        }
+      ]
     }
   ]
 }
