@@ -1,23 +1,23 @@
 version: '3.8'
 services:
-  best-shopping-api:
-    container_name: best-shopping-api
+  sync-love-api:
+    container_name: sync-love-api
     restart: always
     build: .
     ports:
       - ${PORT}:${PORT}
       - 5555:5555
     depends_on:
-      - best-shopping-db
+      - sync-love-db
     volumes:
       - .:/usr/src/app
-    command: npm run dev-container
+    command: sh -c "sleep 5 && npm run dev-container"
 
-  best-shopping-db:
-    container_name: best-shopping-db
+  sync-love-db:
+    container_name: sync-love-db
     image: postgres
     ports:
-      - '${DB_PORT}:${DB_PORT}'
+      - '${DB_PORT}:5432'
     volumes:
       - data:/data/db
     environment:

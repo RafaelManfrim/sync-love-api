@@ -11,88 +11,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Gender {
+  MALE
+  FEMALE
+}
+
 model User {
-  id           Int            @id @default(autoincrement())
-  email        String         @unique
-  name         String
-  password     String
-  isAdmin      Boolean        @default(false)
-  isPremium    Boolean        @default(false)
-  ShoppingList ShoppingList[]
-  Purchase     Purchase[]
+  id                Int            @id  @default(autoincrement())
+  email             String         @unique
+  name              String
+  password_hash     String
+  gender            Gender
+  avatar_url        String
+  is_admin          Boolean        @default(false)
+  is_premium        Boolean        @default(false)
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  refresh_tokens   UserRefreshToken[]
+  couple_invites    CoupleInvite[] @relation(name: "InviterRelation")
+  received_invites  CoupleInvite[] @relation(name: "InviteeRelation")
 }
 
-model ShoppingList {
-  id                  Int                   @id @default(autoincrement())
-  status              Status                @default(active)
-  createdAt           DateTime              @default(now())
-  user                User                  @relation(fields: [userId], references: [id])
-  userId              Int
-  Product             Product[]
-  ShoppingListProduct ShoppingListProduct[]
+model CoupleInvite {
+  id                Int            @id  @default(autoincrement())
+  inviter_id        Int
+  invitee_email     String
+  invited_at        DateTime       @default(now())
+  accepted_at       DateTime?
+  rejected_at       DateTime?
+
+  inviter           User           @relation(name: "InviterRelation", fields: [inviter_id], references: [id])
+  invitee           User           @relation(name: "InviteeRelation", fields: [invitee_email], references: [email])
 }
 
-model ShoppingListProduct {
-  id             Int          @id @default(autoincrement())
-  amount         Int
-  checked        Boolean      @default(false)
-  product        Product      @relation(fields: [productId], references: [id])
-  productId      Int
-  shoppingList   ShoppingList @relation(fields: [shoppingListId], references: [id])
-  shoppingListId Int
+model Couple {
+  id                Int            @id  @default(autoincrement())
+  invite_id         Int
+  inviter_id        Int
+  invitee_id        Int
+  created_at        DateTime       @default(now())
+  is_active         Boolean        @default(true)
 }
 
-model Product {
-  id                  Int                   @id @default(autoincrement())
-  name                String
-  unitOfMeasure       UnitOfMeasure         @default(quantity)
-  ShoppingList        ShoppingList?         @relation(fields: [shoppingListId], references: [id])
-  shoppingListId      Int?
-  ShoppingListProduct ShoppingListProduct[]
-  PurchaseProduct     PurchaseProduct[]
-}
-
-model Purchase {
-  id              Int               @id @default(autoincrement())
-  date            DateTime          @default(now())
-  place_id        Int
-  Place           Place             @relation(fields: [place_id], references: [id])
-  user_id         Int
-  User            User              @relation(fields: [user_id], references: [id])
-  PurchaseProduct PurchaseProduct[]
-}
-
-model PurchaseProduct {
-  id          Int      @id @default(autoincrement())
-  amount      Int
-  unit_price  Float
-  product_id  Int
-  Product     Product  @relation(fields: [product_id], references: [id])
-  purchase_id Int
-  Purchase    Purchase @relation(fields: [purchase_id], references: [id])
-}
-
-model Place {
-  id       Int        @id @default(autoincrement())
-  name     String
-  city_id  Int
-  City     City       @relation(fields: [city_id], references: [id])
-  Purchase Purchase[]
-}
-
-model City {
-  id    Int     @id @default(autoincrement())
-  name  String
-  uf    String
-  Place Place[]
-}
-
-enum UnitOfMeasure {
-  quantity
-  kg
-}
-
-enum Status {
-  active
-  archived
+model UserRefreshToken {
+  id         Int      @id @default(autoincrement())
+  user_id    Int      
+  user       User     @relation(fields: [user_id], references: [id])
+  token      String    @unique
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  expires_at DateTime 
 }
