@@ -17,49 +17,49 @@ enum Gender {
 }
 
 model User {
-  id                Int            @id  @default(autoincrement())
-  email             String         @unique
-  name              String
-  password_hash     String
-  gender            Gender
-  avatar_url        String
-  is_admin          Boolean        @default(false)
-  is_premium        Boolean        @default(false)
-  created_at        DateTime       @default(now())
-  updated_at        DateTime       @updatedAt
+  id            Int      @id @default(autoincrement())
+  email         String   @unique
+  name          String
+  password_hash String
+  gender        Gender
+  avatar_url    String?
+  is_admin      Boolean  @default(false)
+  is_premium    Boolean  @default(false)
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
   refresh_tokens   UserRefreshToken[]
-  couple_invites    CoupleInvite[] @relation(name: "InviterRelation")
-  received_invites  CoupleInvite[] @relation(name: "InviteeRelation")
+  couple_invites   CoupleInvite[]     @relation(name: "InviterRelation")
+  received_invites CoupleInvite[]     @relation(name: "InviteeRelation")
 }
 
 model CoupleInvite {
-  id                Int            @id  @default(autoincrement())
-  inviter_id        Int
-  invitee_email     String
-  invited_at        DateTime       @default(now())
-  accepted_at       DateTime?
-  rejected_at       DateTime?
+  id            Int       @id @default(autoincrement())
+  inviter_id    Int
+  invitee_email String
+  invited_at    DateTime  @default(now())
+  accepted_at   DateTime?
+  rejected_at   DateTime?
 
-  inviter           User           @relation(name: "InviterRelation", fields: [inviter_id], references: [id])
-  invitee           User           @relation(name: "InviteeRelation", fields: [invitee_email], references: [email])
+  inviter User @relation(name: "InviterRelation", fields: [inviter_id], references: [id])
+  invitee User @relation(name: "InviteeRelation", fields: [invitee_email], references: [email])
 }
 
 model Couple {
-  id                Int            @id  @default(autoincrement())
-  invite_id         Int
-  inviter_id        Int
-  invitee_id        Int
-  created_at        DateTime       @default(now())
-  is_active         Boolean        @default(true)
+  id         Int      @id @default(autoincrement())
+  invite_id  Int
+  inviter_id Int
+  invitee_id Int
+  created_at DateTime @default(now())
+  is_active  Boolean  @default(true)
 }
 
 model UserRefreshToken {
   id         Int      @id @default(autoincrement())
-  user_id    Int      
+  user_id    Int
   user       User     @relation(fields: [user_id], references: [id])
-  token      String    @unique
+  token      String   @unique
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
-  expires_at DateTime 
+  expires_at DateTime
 }

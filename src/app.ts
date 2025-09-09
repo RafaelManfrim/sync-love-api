@@ -1,10 +1,25 @@
 import Fastify from 'fastify'
+import cors from '@fastify/cors'
+import fastifyJwt from '@fastify/jwt'
 
 import { env } from './env'
 import { appRoutes } from './http/routes'
 
 const app = Fastify({
   logger: true,
+})
+
+app.register(cors)
+
+app.register(fastifyJwt, {
+  secret: env.JWT_SECRET,
+  cookie: {
+    cookieName: 'refreshToken',
+    signed: false,
+  },
+  sign: {
+    expiresIn: '30m',
+  },
 })
 
 app.register(appRoutes)
