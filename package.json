@@ -1,14 +1,15 @@
 {
-  "name": "best-shopping-api",
+  "name": "sync-love-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.ts",
   "scripts": {
-    "dev": "npx nodemon",
-    "dev-container": "npx nodemon -L",
-    "migration": "sudo docker exec -it best-shopping-api npx prisma migrate dev --name",
-    "migrations": "sudo docker exec -it best-shopping-api npx prisma migrate deploy",
-    "studio": "sudo docker exec -it best-shopping-api npx prisma studio"
+    "dev": "tsx watch src/server.ts",
+    "start": "node build/server.js",
+    "build": "tsup src --out-dir build",
+    "migration": "npx prisma migrate dev --name",
+    "migration-deploy": "npx prisma migrate deploy",
+    "studio": "npx prisma studio"
   },
   "author": "",
   "license": "ISC",
@@ -17,22 +18,28 @@
     "@fastify/jwt": "^10.0.0",
     "@prisma/client": "^5.3.1",
     "bcryptjs": "^3.0.2",
-    "fastify": "^4.23.2",
-    "node": "^20.6.0",
+    "dotenv": "16.4.7",
+    "fastify": "5.2.1",
     "pg": "^8.11.3",
-    "vite": "^4.4.9",
     "zod": "^3.22.2"
   },
   "devDependencies": {
     "@rocketseat/eslint-config": "^2.1.0",
+    "@types/bcryptjs": "2.4.6",
     "@types/node": "^20.6.5",
     "@types/pg": "^8.10.3",
+    "@types/supertest": "6.0.2",
+    "@vitest/coverage-v8": "2.1.8",
+    "@vitest/ui": "2.1.8",
     "dotenv": "^16.3.1",
     "eslint": "^8.50.0",
-    "nodemon": "^3.0.1",
     "prisma": "^5.3.1",
-    "ts-node": "^10.9.1",
+    "supertest": "7.0.0",
+    "npm-run-all": "4.1.5",
+    "tsup": "8.3.5",
+    "tsx": "^4.20.5",
     "typescript": "^5.2.2",
-    "vite-tsconfig-paths": "^4.2.1"
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "2.1.8"
   }
 }

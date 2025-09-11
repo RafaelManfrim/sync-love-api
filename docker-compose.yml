@@ -1,18 +1,5 @@
 version: '3.8'
 services:
-  sync-love-api:
-    container_name: sync-love-api
-    restart: always
-    build: .
-    ports:
-      - ${PORT}:${PORT}
-      - 5555:5555
-    depends_on:
-      - sync-love-db
-    volumes:
-      - .:/usr/src/app
-    command: sh -c "sleep 5 && npm run dev-container"
-
   sync-love-db:
     container_name: sync-love-db
     image: postgres

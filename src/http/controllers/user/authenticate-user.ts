@@ -1,8 +1,11 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
-import { prisma } from '@lib/prisma'
 
 import { generateTokensJWT } from '@utils/generate-tokens-jwt'
+import { InvalidCredentialsError } from '@/use-cases/errors/invalid-credentials-error'
+import { makeAuthenticateUseCase } from '@/use-cases/factories/make-authenticate-use-case'
+import { makeDeleteOldRefreshTokenUseCase } from '@/use-cases/factories/make-delete-old-refresh-token-use-case'
+import { makeCreateRefreshTokenUseCase } from '@/use-cases/factories/make-create-refresh-token-use-case'
 
 export async function authenticateUser(
   request: FastifyRequest,
@@ -15,42 +18,35 @@ export async function authenticateUser(
 
   const { email, password } = bodySchema.parse(request.body)
 
-  const user = await prisma.user.findUnique({
-    where: {
-      email,
-      password_hash: password,
-    },
-  })
+  try {
+    const authenticateUseCase = makeAuthenticateUseCase()
 
-  if (!user) {
-    return reply.status(401).send({
-      message: 'Credenciais inválidas',
+    const { user } = await authenticateUseCase.execute({ email, password })
+
+    const { access, refresh } = await generateTokensJWT(user, reply)
+
+    const deleteOldRefreshTokenUseCase = makeDeleteOldRefreshTokenUseCase()
+    await deleteOldRefreshTokenUseCase.execute({ userId: user.id })
+
+    const createRefreshTokenUseCase = makeCreateRefreshTokenUseCase()
+    await createRefreshTokenUseCase.execute({ userId: user.id, token: refresh })
+
+    return reply.status(200).send({
+      access_token: access,
+      refresh_token: refresh,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+      },
     })
+  } catch (err) {
+    if (err instanceof InvalidCredentialsError) {
+      return reply.status(400).send({
+        message: err.message,
+      })
+    }
+
+    throw err
   }
-
-  const { access, refresh } = await generateTokensJWT(user, reply)
-
-  await prisma.userRefreshToken.deleteMany({
-    where: {
-      user_id: user.id,
-    },
-  })
-
-  await prisma.userRefreshToken.create({
-    data: {
-      user_id: user.id,
-      token: refresh,
-      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-    },
-  })
-
-  return reply.status(200).send({
-    access_token: access,
-    refresh_token: refresh,
-    user: {
-      id: user.id,
-      name: user.name,
-      email: user.email,
-    },
-  })
 }
