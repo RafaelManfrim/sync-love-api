@@ -30,7 +30,6 @@ model User {
 
   refresh_tokens   UserRefreshToken[]
   couple_invites   CoupleInvite[]     @relation(name: "InviterRelation")
-  received_invites CoupleInvite[]     @relation(name: "InviteeRelation")
 }
 
 model CoupleInvite {
@@ -42,7 +41,6 @@ model CoupleInvite {
   rejected_at   DateTime?
 
   inviter User @relation(name: "InviterRelation", fields: [inviter_id], references: [id])
-  invitee User @relation(name: "InviteeRelation", fields: [invitee_email], references: [email])
 }
 
 model Couple {

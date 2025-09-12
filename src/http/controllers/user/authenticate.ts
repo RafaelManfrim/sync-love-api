@@ -7,7 +7,7 @@ import { makeAuthenticateUseCase } from '@/use-cases/factories/make-authenticate
 import { makeDeleteOldRefreshTokenUseCase } from '@/use-cases/factories/make-delete-old-refresh-token-use-case'
 import { makeCreateRefreshTokenUseCase } from '@/use-cases/factories/make-create-refresh-token-use-case'
 
-export async function authenticateUser(
+export async function authenticate(
   request: FastifyRequest,
   reply: FastifyReply,
 ) {

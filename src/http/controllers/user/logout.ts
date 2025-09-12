@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { makeLogoutUseCase } from '@/use-cases/factories/make-logout-use-case'
-import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
+import { UserNotFoundError } from '@/use-cases/errors/user-not-found-error'
 
 export async function logout(request: FastifyRequest, reply: FastifyReply) {
   const userId = request.user.sub
@@ -10,7 +10,7 @@ export async function logout(request: FastifyRequest, reply: FastifyReply) {
   try {
     await logoutUseCase.execute({ userId })
   } catch (err) {
-    if (err instanceof ResourceNotFoundError) {
+    if (err instanceof UserNotFoundError) {
       return reply.status(404).send({ message: err.message })
     }
   }

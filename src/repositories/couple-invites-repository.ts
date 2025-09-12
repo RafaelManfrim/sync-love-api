@@ -1,5 +1,8 @@
+import { CoupleInvite, Prisma } from '@prisma/client'
+
 export interface CoupleInvitesRepository {
-  create(): Promise<void>
-  listByUserId(userId: number): Promise<any[]>
+  listByUserId(userId: number): Promise<CoupleInvite[]>
+  listByInviteeEmail(email: string): Promise<CoupleInvite[]>
+  create(data: Prisma.CoupleInviteUncheckedCreateInput): Promise<CoupleInvite>
   declineById(id: number): Promise<void>
 }
