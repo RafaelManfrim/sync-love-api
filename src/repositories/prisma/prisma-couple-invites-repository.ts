@@ -40,7 +40,63 @@ export class PrismaCoupleInvitesRepository implements CoupleInvitesRepository {
     return invites
   }
 
-  async declineById(id: number): Promise<void> {
+  async findById(id: number): Promise<CoupleInvite | null> {
+    const invite = await prisma.coupleInvite.findUnique({
+      where: {
+        id,
+      },
+    })
+
+    return invite
+  }
+
+  async findByInviterIdAndInviteeEmail(
+    inviterId: number,
+    inviteeEmail: string,
+  ): Promise<CoupleInvite | null> {
+    const invite = await prisma.coupleInvite.findFirst({
+      where: {
+        inviter_id: inviterId,
+        invitee_email: inviteeEmail,
+      },
+    })
+
+    return invite
+  }
+
+  async acceptById(id: number): Promise<CoupleInvite> {
+    return await prisma.coupleInvite.update({
+      where: {
+        id,
+      },
+      data: {
+        accepted_at: new Date(),
+      },
+      include: {
+        inviter: {
+          select: {
+            email: true,
+            name: true,
+            gender: true,
+            avatar_url: true,
+          },
+        },
+      },
+    })
+  }
+
+  async declineById(id: number): Promise<CoupleInvite> {
+    return await prisma.coupleInvite.update({
+      where: {
+        id,
+      },
+      data: {
+        rejected_at: new Date(),
+      },
+    })
+  }
+
+  async deleteById(id: number): Promise<void> {
     await prisma.coupleInvite.delete({
       where: {
         id,

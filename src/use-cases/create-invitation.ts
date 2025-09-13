@@ -2,6 +2,7 @@ import { UsersRepository } from '@/repositories/users-repository'
 import { CoupleInvitesRepository } from '@/repositories/couple-invites-repository'
 import { InviterNotFoundError } from './errors/inviter-not-found-error'
 import { CoupleInvite } from '@prisma/client'
+import { InvitationAlreadyExistsError } from './errors/invitation-already-exists-error'
 
 interface CreateInvitationUseCaseRequest {
   inviterId: number
@@ -26,6 +27,16 @@ export class CreateInvitationUseCase {
 
     if (!inviter) {
       throw new InviterNotFoundError()
+    }
+
+    const existingInvite =
+      await this.coupleInvitesRepository.findByInviterIdAndInviteeEmail(
+        inviter.id,
+        email,
+      )
+
+    if (existingInvite) {
+      throw new InvitationAlreadyExistsError()
     }
 
     const invite = await this.coupleInvitesRepository.create({

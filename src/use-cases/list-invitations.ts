@@ -8,7 +8,8 @@ interface ListInvitationsUseCaseRequest {
 }
 
 interface ListInvitationsUseCaseResponse {
-  invites: CoupleInvite[]
+  recievedInvites: CoupleInvite[]
+  sentInvites?: CoupleInvite[]
 }
 
 export class ListInvitationsUseCase {
@@ -26,10 +27,11 @@ export class ListInvitationsUseCase {
       throw new UserNotFoundError()
     }
 
-    const invites = await this.coupleInvitesRepository.listByInviteeEmail(
-      user.email,
-    )
+    const recievedInvites =
+      await this.coupleInvitesRepository.listByInviteeEmail(user.email)
 
-    return { invites }
+    const sentInvites = await this.coupleInvitesRepository.listByUserId(user.id)
+
+    return { recievedInvites, sentInvites }
   }
 }

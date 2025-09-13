@@ -8,9 +8,10 @@ export async function list(request: FastifyRequest, reply: FastifyReply) {
   const listInvitationsUseCase = makeListInvitationsUseCase()
 
   try {
-    const { invites } = await listInvitationsUseCase.execute({ userId })
+    const { recievedInvites, sentInvites } =
+      await listInvitationsUseCase.execute({ userId })
 
-    return reply.send({ invites })
+    return reply.send({ recievedInvites, sentInvites })
   } catch (err) {
     if (err instanceof UserNotFoundError) {
       return reply.status(404).send({ message: err.message })

@@ -28,8 +28,11 @@ model User {
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
 
-  refresh_tokens   UserRefreshToken[]
-  couple_invites   CoupleInvite[]     @relation(name: "InviterRelation")
+  couple_id Int?
+
+  refresh_tokens UserRefreshToken[]
+  couple_invites CoupleInvite[]     @relation(name: "InviterRelation")
+  couple         Couple?            @relation(fields: [couple_id], references: [id])
 }
 
 model CoupleInvite {
@@ -50,6 +53,7 @@ model Couple {
   invitee_id Int
   created_at DateTime @default(now())
   is_active  Boolean  @default(true)
+  User       User[]
 }
 
 model UserRefreshToken {

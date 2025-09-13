@@ -1,3 +1,5 @@
+import { Couple, Prisma } from '@prisma/client'
+
 export interface CouplesRepository {
-  create(): Promise<void>
+  create(data: Prisma.CoupleCreateInput): Promise<Couple>
 }

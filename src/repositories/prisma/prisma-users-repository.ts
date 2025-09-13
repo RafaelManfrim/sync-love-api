@@ -18,6 +18,29 @@ export class PrismaUsersRepository implements UsersRepository {
       where: {
         id,
       },
+      include: {
+        couple: {
+          select: {
+            invite_id: true,
+            created_at: true,
+            is_active: true,
+            invitee_id: true,
+            User: {
+              where: {
+                id: {
+                  not: id,
+                },
+              },
+              select: {
+                name: true,
+                email: true,
+                avatar_url: true,
+                gender: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     return user
@@ -25,6 +48,17 @@ export class PrismaUsersRepository implements UsersRepository {
 
   async create(data: Prisma.UserCreateInput) {
     const user = await prisma.user.create({
+      data,
+    })
+
+    return user
+  }
+
+  async update(id: number, data: Prisma.UserUpdateInput) {
+    const user = await prisma.user.update({
+      where: {
+        id,
+      },
       data,
     })
 
