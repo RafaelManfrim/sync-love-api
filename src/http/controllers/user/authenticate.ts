@@ -35,9 +35,8 @@ export async function authenticate(
       access_token: access,
       refresh_token: refresh,
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
+        ...user,
+        password_hash: undefined,
       },
     })
   } catch (err) {

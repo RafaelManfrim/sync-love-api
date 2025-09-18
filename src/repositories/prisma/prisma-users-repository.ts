@@ -8,6 +8,29 @@ export class PrismaUsersRepository implements UsersRepository {
       where: {
         email,
       },
+      include: {
+        couple: {
+          select: {
+            invite_id: true,
+            created_at: true,
+            is_active: true,
+            invitee_id: true,
+            User: {
+              where: {
+                email: {
+                  not: email,
+                },
+              },
+              select: {
+                name: true,
+                email: true,
+                avatar_url: true,
+                gender: true,
+              },
+            },
+          },
+        },
+      },
     })
 
     return user
