@@ -2,9 +2,11 @@ import { FastifyInstance } from 'fastify'
 
 import { verifyJWT } from '../middlewares/verify-jwt'
 import { listByCouple } from '../controllers/shopping-list/list-by-couple'
+import { create } from '../controllers/shopping-list/create'
 
 export async function shoppingListsRoutes(app: FastifyInstance) {
   app.addHook('onRequest', verifyJWT)
 
   app.get('/shopping-lists', listByCouple)
+  app.post('/shopping-lists', create)
 }
