@@ -4,6 +4,7 @@ import { FastifyReply } from 'fastify'
 export async function generateTokensJWT(user: User, reply: FastifyReply) {
   const access = await reply.jwtSign({
     sub: user.id,
+    coupleId: user.couple_id,
   })
 
   const refresh = await reply.jwtSign({
