@@ -16,6 +16,11 @@ enum Gender {
   FEMALE
 }
 
+enum UnitOfMeasure {
+  QUANTITY
+  WEIGHT
+}
+
 model User {
   id            Int      @id @default(autoincrement())
   email         String   @unique
@@ -30,9 +35,11 @@ model User {
 
   couple_id Int?
 
-  refresh_tokens UserRefreshToken[]
-  couple_invites CoupleInvite[]     @relation(name: "InviterRelation")
-  couple         Couple?            @relation(fields: [couple_id], references: [id])
+  refresh_tokens   UserRefreshToken[]
+  couple_invites   CoupleInvite[]     @relation(name: "InviterRelation")
+  couple           Couple?            @relation(fields: [couple_id], references: [id])
+  ShoppingLists    ShoppingList[]
+  ShoppingListItem ShoppingListItem[]
 }
 
 model CoupleInvite {
@@ -47,13 +54,14 @@ model CoupleInvite {
 }
 
 model Couple {
-  id         Int      @id @default(autoincrement())
-  invite_id  Int
-  inviter_id Int
-  invitee_id Int
-  created_at DateTime @default(now())
-  is_active  Boolean  @default(true)
-  User       User[]
+  id            Int            @id @default(autoincrement())
+  invite_id     Int
+  inviter_id    Int
+  invitee_id    Int
+  created_at    DateTime       @default(now())
+  is_active     Boolean        @default(true)
+  User          User[]
+  ShoppingLists ShoppingList[]
 }
 
 model UserRefreshToken {
@@ -64,4 +72,41 @@ model UserRefreshToken {
   created_at DateTime @default(now())
   updated_at DateTime @updatedAt
   expires_at DateTime
+}
+
+model Product {
+  id              Int           @id @default(autoincrement())
+  name            String        @unique
+  unit_of_measure UnitOfMeasure
+
+  items ShoppingListItem[]
+}
+
+model ShoppingListItem {
+  id               Int      @id @default(autoincrement())
+  is_checked       Boolean  @default(false)
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+  shopping_list_id Int
+  product_id       Int
+  author_id        Int
+  unit_price       Decimal?
+
+  shopping_list ShoppingList @relation(fields: [shopping_list_id], references: [id])
+  product       Product      @relation(fields: [product_id], references: [id])
+  author        User         @relation(fields: [author_id], references: [id])
+}
+
+model ShoppingList {
+  id         Int       @id @default(autoincrement())
+  name       String?
+  couple_id  Int
+  author_id  Int
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  closed_at  DateTime?
+
+  author           User               @relation(fields: [author_id], references: [id])
+  couple           Couple             @relation(fields: [couple_id], references: [id])
+  ShoppingListItem ShoppingListItem[]
 }
