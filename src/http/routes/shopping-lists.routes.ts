@@ -14,4 +14,5 @@ export async function shoppingListsRoutes(app: FastifyInstance) {
 
   app.post('/shopping-lists/:listId/items', addItem)
   app.patch('/shopping-lists/items/:itemId/toggle', toggleItemCheck)
+  app.post('/shopping-lists/:listId/close', close)
 }
