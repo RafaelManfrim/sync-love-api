@@ -18,8 +18,20 @@ export class PrismaShoppingListsRepository implements ShoppingListsRepository {
       where: {
         couple_id: coupleId,
       },
+      include: {
+        ShoppingListItem: true,
+      },
     })
 
     return shoppingLists
+  }
+
+  async findById(id: number): Promise<ShoppingList | null> {
+    const shoppingList = await prisma.shoppingList.findUnique({
+      where: {
+        id,
+      },
+    })
+    return shoppingList
   }
 }

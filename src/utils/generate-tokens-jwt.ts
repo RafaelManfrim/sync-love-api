@@ -9,6 +9,7 @@ export async function generateTokensJWT(user: User, reply: FastifyReply) {
 
   const refresh = await reply.jwtSign({
     sub: user.id,
+    coupleId: user.couple_id,
     expiresIn: '7d',
   })
 
