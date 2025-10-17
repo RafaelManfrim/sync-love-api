@@ -1,17 +1,14 @@
-import { PrismaPurchasesRepository } from '@/repositories/prisma/prisma-purchases-repository'
-import { PrismaShoppingItemsRepository } from '@/repositories/prisma/prisma-shopping-items-repository'
 import { PrismaShoppingListsRepository } from '@/repositories/prisma/prisma-shopping-lists-repository'
 import { CloseShoppingListUseCase } from '../close-shopping-list'
+import { PrismaShoppingListItemsRepository } from '@/repositories/prisma/prisma-shopping-list-items-repository'
 
 export function makeCloseShoppingListUseCase() {
   const shoppingListsRepository = new PrismaShoppingListsRepository()
-  const shoppingItemsRepository = new PrismaShoppingItemsRepository()
-  const purchasesRepository = new PrismaPurchasesRepository()
+  const shoppingListItemsRepository = new PrismaShoppingListItemsRepository()
 
   const useCase = new CloseShoppingListUseCase(
     shoppingListsRepository,
-    shoppingItemsRepository,
-    purchasesRepository,
+    shoppingListItemsRepository,
   )
 
   return useCase

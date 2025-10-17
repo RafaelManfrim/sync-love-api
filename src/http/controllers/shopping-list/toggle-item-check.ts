@@ -7,16 +7,17 @@ export async function toggleItemCheck(
   reply: FastifyReply,
 ) {
   const toggleItemCheckParamsSchema = z.object({
+    listId: z.coerce.number(),
     itemId: z.coerce.number(),
   })
 
-  const { itemId } = toggleItemCheckParamsSchema.parse(request.params)
+  const { itemId, listId } = toggleItemCheckParamsSchema.parse(request.params)
 
   const toggleShoppingItemCheckUseCase = makeToggleShoppingItemCheckUseCase()
 
   await toggleShoppingItemCheckUseCase.execute({
+    listId,
     shoppingItemId: itemId,
-    userId: request.user.sub,
     coupleId: request.user.coupleId,
   })
 

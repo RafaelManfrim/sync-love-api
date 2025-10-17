@@ -9,7 +9,7 @@ export async function addItem(request: FastifyRequest, reply: FastifyReply) {
 
   const addItemBodySchema = z.object({
     itemName: z.string(),
-    quantity: z.number().min(1),
+    quantity: z.number().optional().default(1),
   })
 
   const { listId } = addItemParamsSchema.parse(request.params)
@@ -20,7 +20,7 @@ export async function addItem(request: FastifyRequest, reply: FastifyReply) {
   await addItemToShoppingListUseCase.execute({
     shoppingListId: listId,
     itemName,
-    // quantity,
+    quantity,
     userId: request.user.sub,
     coupleId: request.user.coupleId,
   })

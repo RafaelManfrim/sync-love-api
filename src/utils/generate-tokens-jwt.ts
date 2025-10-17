@@ -5,6 +5,7 @@ export async function generateTokensJWT(user: User, reply: FastifyReply) {
   const access = await reply.jwtSign({
     sub: user.id,
     coupleId: user.couple_id,
+    expiresIn: '5m',
   })
 
   const refresh = await reply.jwtSign({

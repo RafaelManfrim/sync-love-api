@@ -6,4 +6,5 @@ export interface ShoppingListItemsRepository {
   ): Promise<ShoppingListItem>
   findById(id: number): Promise<ShoppingListItem | null>
   save(data: ShoppingListItem): Promise<ShoppingListItem>
+  findManyByIds(ids: number[]): Promise<ShoppingListItem[]>
 }

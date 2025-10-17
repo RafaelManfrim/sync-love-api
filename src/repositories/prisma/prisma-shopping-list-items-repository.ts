@@ -20,7 +20,6 @@ export class PrismaShoppingListItemsRepository
         id,
       },
       include: {
-        // Incluir a lista para podermos verificar o dono
         shopping_list: true,
       },
     })
@@ -28,12 +27,29 @@ export class PrismaShoppingListItemsRepository
   }
 
   async save(data: ShoppingListItem): Promise<ShoppingListItem> {
+    const { id, ...rest } = data
+
     const shoppingListItem = await prisma.shoppingListItem.update({
       where: {
-        id: data.id,
+        id,
       },
-      data,
+      data: {
+        is_checked: rest.is_checked,
+        unit_price: rest.unit_price,
+        quantity: rest.quantity,
+      },
     })
     return shoppingListItem
+  }
+
+  async findManyByIds(ids: number[]): Promise<ShoppingListItem[]> {
+    const shoppingListItems = await prisma.shoppingListItem.findMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
+    })
+    return shoppingListItems
   }
 }

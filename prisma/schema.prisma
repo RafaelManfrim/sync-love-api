@@ -60,7 +60,9 @@ model Couple {
   invitee_id    Int
   created_at    DateTime       @default(now())
   is_active     Boolean        @default(true)
+
   User          User[]
+  Product       Product[]
   ShoppingLists ShoppingList[]
 }
 
@@ -78,8 +80,10 @@ model Product {
   id              Int           @id @default(autoincrement())
   name            String        @unique
   unit_of_measure UnitOfMeasure
+  couple_id       Int
 
   items ShoppingListItem[]
+  couple Couple @relation(fields: [couple_id], references: [id])
 }
 
 model ShoppingListItem {
@@ -87,10 +91,11 @@ model ShoppingListItem {
   is_checked       Boolean  @default(false)
   created_at       DateTime @default(now())
   updated_at       DateTime @updatedAt
+  quantity         Int      @default(1)
+  unit_price       Decimal?
   shopping_list_id Int
   product_id       Int
   author_id        Int
-  unit_price       Decimal?
 
   shopping_list ShoppingList @relation(fields: [shopping_list_id], references: [id])
   product       Product      @relation(fields: [product_id], references: [id])

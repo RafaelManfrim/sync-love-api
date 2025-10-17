@@ -4,6 +4,7 @@ import { ShoppingListsRepository } from '@/repositories/shopping-lists-repositor
 import { ShoppingListItem } from '@prisma/client'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { UnauthorizedError } from './errors/unauthorized-error'
+import { ShoppingListAlreadyClosedError } from './errors/shopping-list-already-closed-error'
 
 interface AddItemToShoppingListUseCaseRequest {
   itemName: string
@@ -11,6 +12,7 @@ interface AddItemToShoppingListUseCaseRequest {
   userId: number
   coupleId: number
   unitOfMeasure?: 'QUANTITY' | 'WEIGHT'
+  quantity?: number
 }
 
 interface AddItemToShoppingListUseCaseResponse {
@@ -30,6 +32,7 @@ export class AddItemToShoppingListUseCase {
     userId,
     coupleId,
     unitOfMeasure,
+    quantity,
   }: AddItemToShoppingListUseCaseRequest): Promise<AddItemToShoppingListUseCaseResponse> {
     const shoppingList =
       await this.shoppingListsRepository.findById(shoppingListId)
@@ -42,12 +45,17 @@ export class AddItemToShoppingListUseCase {
       throw new UnauthorizedError()
     }
 
+    if (shoppingList.closed_at) {
+      throw new ShoppingListAlreadyClosedError()
+    }
+
     let product = await this.productsRepository.findByName(itemName)
 
     if (!product) {
       product = await this.productsRepository.create({
         name: itemName,
         unit_of_measure: unitOfMeasure || 'QUANTITY',
+        couple_id: coupleId,
       })
     }
 
@@ -55,6 +63,7 @@ export class AddItemToShoppingListUseCase {
       shopping_list_id: shoppingListId,
       product_id: product.id,
       author_id: userId,
+      quantity: quantity || 1,
     })
 
     return { shoppingItem }

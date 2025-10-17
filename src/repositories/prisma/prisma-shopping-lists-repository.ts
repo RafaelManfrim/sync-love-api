@@ -20,6 +20,13 @@ export class PrismaShoppingListsRepository implements ShoppingListsRepository {
       },
       include: {
         ShoppingListItem: true,
+        author: {
+          select: {
+            name: true,
+            gender: true,
+            avatar_url: true,
+          },
+        },
       },
     })
 
@@ -30,6 +37,13 @@ export class PrismaShoppingListsRepository implements ShoppingListsRepository {
     const shoppingList = await prisma.shoppingList.findUnique({
       where: {
         id,
+      },
+      include: {
+        ShoppingListItem: {
+          include: {
+            product: true,
+          },
+        },
       },
     })
     return shoppingList

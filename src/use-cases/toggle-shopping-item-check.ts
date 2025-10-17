@@ -2,11 +2,12 @@ import { ShoppingListItem } from '@prisma/client'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { UnauthorizedError } from './errors/unauthorized-error'
 import { ShoppingListItemsRepository } from '@/repositories/shopping-list-items-repository'
+import { ShoppingListsRepository } from '@/repositories/shopping-lists-repository'
 
 interface ToggleShoppingItemCheckUseCaseRequest {
   shoppingItemId: number
-  userId: number
   coupleId: number
+  listId: number
 }
 
 interface ToggleShoppingItemCheckUseCaseResponse {
@@ -14,14 +15,16 @@ interface ToggleShoppingItemCheckUseCaseResponse {
 }
 
 export class ToggleShoppingItemCheckUseCase {
-  constructor(private shoppingItemsRepository: ShoppingListItemsRepository) {}
+  constructor(
+    private shoppingListsRepository: ShoppingListsRepository,
+    private shoppingItemsRepository: ShoppingListItemsRepository,
+  ) {}
 
   async execute({
     shoppingItemId,
-    userId,
     coupleId,
+    listId,
   }: ToggleShoppingItemCheckUseCaseRequest): Promise<ToggleShoppingItemCheckUseCaseResponse> {
-    // O findById agora inclui a shopping_list
     const shoppingItem =
       await this.shoppingItemsRepository.findById(shoppingItemId)
 
@@ -29,22 +32,23 @@ export class ToggleShoppingItemCheckUseCase {
       throw new ResourceNotFoundError()
     }
 
-    // Verificação de segurança
-    if (shoppingItem.shopping_list.couple_id !== coupleId) {
+    const shoppingList = await this.shoppingListsRepository.findById(listId)
+
+    if (!shoppingList) {
+      throw new ResourceNotFoundError()
+    }
+
+    if (shoppingList.couple_id !== coupleId) {
       throw new UnauthorizedError()
     }
 
-    const isChecked = !!shoppingItem.checked_at
-
-    if (isChecked) {
-      // Desmarcar
-      shoppingItem.checked_at = null
-      shoppingItem.checked_by = null
-    } else {
-      // Marcar
-      shoppingItem.checked_at = new Date()
-      shoppingItem.checked_by = userId
+    if (shoppingItem.shopping_list_id !== shoppingList.id) {
+      throw new ResourceNotFoundError()
     }
+
+    const isChecked = !!shoppingItem.is_checked
+
+    shoppingItem.is_checked = !isChecked
 
     const updatedShoppingItem =
       await this.shoppingItemsRepository.save(shoppingItem)
