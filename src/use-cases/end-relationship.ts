@@ -1,53 +1,71 @@
 import { prisma } from '@/lib/prisma'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
+import { PrismaClient } from '@prisma/client'
 
 interface EndRelationshipUseCaseRequest {
   coupleId: number
 }
 
 export class EndRelationshipUseCase {
-  async execute({ coupleId }: EndRelationshipUseCaseRequest) {
-    await prisma.$transaction(async (tx) => {
-      // Garante que o casal existe
-      const couple = await tx.couple.findUnique({ where: { id: coupleId } })
-      if (!couple) {
-        throw new ResourceNotFoundError()
-      }
+  async execute(
+    { coupleId }: EndRelationshipUseCaseRequest,
+    tx?: PrismaClient,
+  ) {
+    const prismaClient = tx || prisma
 
-      await tx.coupleInvite.delete({
+    const couple = await prismaClient.couple.findUnique({
+      where: { id: coupleId },
+    })
+
+    if (!couple) {
+      throw new ResourceNotFoundError()
+    }
+
+    const transactionLogic = async (prismaTx: PrismaClient) => {
+      // Garante que o casal existe
+
+      await prismaTx.coupleInvite.delete({
         where: { id: couple.invite_id },
       })
 
-      const shoppingLists = await tx.shoppingList.findMany({
+      const shoppingLists = await prismaTx.shoppingList.findMany({
         where: { couple_id: coupleId },
         select: { id: true }, // Apenas precisamos dos IDs
       })
       const shoppingListIds = shoppingLists.map((list) => list.id)
 
-      await tx.shoppingListItem.deleteMany({
+      await prismaTx.shoppingListItem.deleteMany({
         where: {
           shopping_list_id: { in: shoppingListIds },
         },
       })
 
-      await tx.product.deleteMany({
+      await prismaTx.product.deleteMany({
         where: { couple_id: coupleId },
       })
 
-      await tx.shoppingList.deleteMany({
+      await prismaTx.shoppingList.deleteMany({
         where: { couple_id: coupleId },
       })
 
       // Desvincula os usuários do casal
-      await tx.user.updateMany({
+      await prismaTx.user.updateMany({
         where: { couple_id: coupleId },
         data: { couple_id: null },
       })
 
       // Deleta o registro do casal
-      await tx.couple.delete({
+      await prismaTx.couple.delete({
         where: { id: coupleId },
       })
-    })
+    }
+
+    if (tx) {
+      await transactionLogic(tx)
+    } else {
+      await prisma.$transaction(async (newTx) => {
+        await transactionLogic(newTx as unknown as PrismaClient)
+      })
+    }
   }
 }
