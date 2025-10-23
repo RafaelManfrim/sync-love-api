@@ -14,6 +14,7 @@ export class PrismaCoupleInvitesRepository implements CoupleInvitesRepository {
     const invites = await prisma.coupleInvite.findMany({
       where: {
         inviter_id: userId,
+        accepted_at: null,
       },
     })
 
@@ -24,6 +25,8 @@ export class PrismaCoupleInvitesRepository implements CoupleInvitesRepository {
     const invites = await prisma.coupleInvite.findMany({
       where: {
         invitee_email: email,
+        accepted_at: null,
+        rejected_at: null,
       },
       include: {
         inviter: {
