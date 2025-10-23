@@ -40,6 +40,9 @@ model User {
   couple           Couple?            @relation(fields: [couple_id], references: [id])
   ShoppingLists    ShoppingList[]
   ShoppingListItem ShoppingListItem[]
+  CreatedCalendarEvents CalendarEvent[]
+  CreatedHouseholdTasks   HouseholdTask[]           @relation("UserWhoCreatedTask")
+  CompletedHouseholdTasks HouseholdTaskCompletion[] @relation("UserWhoCompletedTask")
 }
 
 model CoupleInvite {
@@ -64,6 +67,8 @@ model Couple {
   User          User[]
   Product       Product[]
   ShoppingLists ShoppingList[]
+  CalendarEvents CalendarEvent[]
+  HouseholdTasks HouseholdTask[]
 }
 
 model UserRefreshToken {
@@ -114,4 +119,77 @@ model ShoppingList {
   author           User               @relation(fields: [author_id], references: [id])
   couple           Couple             @relation(fields: [couple_id], references: [id])
   ShoppingListItem ShoppingListItem[]
+}
+
+model CalendarEventCategory {
+  id    Int     @id @default(autoincrement())
+  name  String  @unique // Ex: "Aniversário", "Trabalho", "Lazer"
+  color String? // Ex: "#FF5733", para o frontend saber como exibir
+
+  events CalendarEvent[]
+}
+
+model CalendarEvent {
+  id              Int      @id @default(autoincrement())
+  title           String
+  description     String?
+  start_time      DateTime // Data e hora da *primeira* ocorrência do evento
+  end_time        DateTime // Data e hora do *fim* da primeira ocorrência
+  is_all_day      Boolean  @default(false)
+
+  // O "coração" da funcionalidade de recorrência:
+  // Armazena uma string no formato iCalendar (RRULE) - (RFC 5545)
+  // Ex: "FREQ=YEARLY" (para aniversários)
+  // Ex: "FREQ=WEEKLY;BYDAY=MO" (toda segunda-feira)
+  // Se for NULO, o evento é único (não se repete).
+  recurrence_rule String?
+
+  couple_id       Int
+  author_id       Int
+  category_id     Int? // Opcional, para vincular à categoria (Aniversário, etc)
+
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  couple    Couple                 @relation(fields: [couple_id], references: [id])
+  author    User                   @relation(fields: [author_id], references: [id])
+  category  CalendarEventCategory? @relation(fields: [category_id], references: [id])
+}
+
+model HouseholdTask {
+  id              Int      @id @default(autoincrement())
+  title           String
+  description     String?
+  couple_id       Int
+  author_id       Int      // <-- Responde: "quem cadastrou essa tarefa"
+  start_date      DateTime // Data de início da regra ou data de vencimento (para tarefas únicas)
+  
+  // Regra de repetição (igual ao Calendário)
+  // Se null: é uma "tarefa única"
+  // Se "FREQ=DAILY": é uma tarefa que se repete diariamente
+  recurrence_rule String?  
+
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  author      User                      @relation("UserWhoCreatedTask", fields: [author_id], references: [id])
+  couple      Couple                    @relation(fields: [couple_id], references: [id])
+  completions HouseholdTaskCompletion[]
+}
+
+model HouseholdTaskCompletion {
+  id                   Int      @id @default(autoincrement())
+  household_task_id    Int      // Link para a definição da tarefa (ex: "Lavar a louça")
+  completed_by_user_id Int      // <-- Responde: "quem concluiu"
+  completed_at         DateTime @default(now()) // A hora exata que o usuário deu "check"
+  
+  // Este é o campo mais importante para "organizar por dia"
+  // Armazena para qual dia esta conclusão se refere (ex: 2025-10-23)
+  task_due_date        DateTime @db.Date 
+
+  household_task HouseholdTask @relation(fields: [household_task_id], references: [id])
+  completed_by   User          @relation("UserWhoCompletedTask", fields: [completed_by_user_id], references: [id])
+
+  // Garante que uma tarefa (ex: "Lavar Louça") só possa ser concluída UMA VEZ por dia de vencimento.
+  @@unique([household_task_id, task_due_date])
 }
