@@ -43,6 +43,7 @@ model User {
   CreatedCalendarEvents CalendarEvent[]
   CreatedHouseholdTasks   HouseholdTask[]           @relation("UserWhoCreatedTask")
   CompletedHouseholdTasks HouseholdTaskCompletion[] @relation("UserWhoCompletedTask")
+  CreatedHouseholdTaskExceptions HouseholdTaskException[]
 }
 
 model CoupleInvite {
@@ -171,10 +172,12 @@ model HouseholdTask {
 
   created_at      DateTime @default(now())
   updated_at      DateTime @updatedAt
+  deleted_at      DateTime?
 
   author      User                      @relation("UserWhoCreatedTask", fields: [author_id], references: [id])
   couple      Couple                    @relation(fields: [couple_id], references: [id])
   completions HouseholdTaskCompletion[]
+  exceptions  HouseholdTaskException[]
 }
 
 model HouseholdTaskCompletion {
@@ -192,4 +195,18 @@ model HouseholdTaskCompletion {
 
   // Garante que uma tarefa (ex: "Lavar Louça") só possa ser concluída UMA VEZ por dia de vencimento.
   @@unique([household_task_id, task_due_date])
+}
+
+model HouseholdTaskException {
+  id                  Int      @id @default(autoincrement())
+  household_task_id   Int      // Link para a definição da tarefa
+  exception_date      DateTime @db.Date // O dia (YYYY-MM-DD) que foi cancelado
+  created_at          DateTime @default(now())
+  created_by_user_id  Int      // Quem cancelou
+
+  household_task HouseholdTask @relation(fields: [household_task_id], references: [id])
+  created_by     User          @relation(fields: [created_by_user_id], references: [id])
+
+  // Garante que uma tarefa só possa ser cancelada UMA VEZ para um dia específico
+  @@unique([household_task_id, exception_date])
 }

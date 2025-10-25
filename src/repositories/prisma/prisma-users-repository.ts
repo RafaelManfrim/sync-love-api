@@ -1,5 +1,5 @@
 import { prisma } from '@/lib/prisma'
-import { Prisma } from '@prisma/client'
+import { Prisma, User } from '@prisma/client'
 import { UsersRepository } from '../users-repository'
 
 export class PrismaUsersRepository implements UsersRepository {
@@ -86,5 +86,14 @@ export class PrismaUsersRepository implements UsersRepository {
     })
 
     return user
+  }
+
+  async findManyByCoupleId(coupleId: number): Promise<User[]> {
+    const users = await prisma.user.findMany({
+      where: {
+        couple_id: coupleId,
+      },
+    })
+    return users
   }
 }

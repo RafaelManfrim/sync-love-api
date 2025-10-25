@@ -5,6 +5,7 @@ import { usersRoutes } from './users.routes'
 import { couplesRoutes } from './couples.routes'
 import { coupleInvitationsRoutes } from './couple-invitations.routes'
 import { shoppingListsRoutes } from './shopping-lists.routes'
+import { householdTasksRoutes } from './household-tasks.routes'
 
 export async function appRoutes(app: FastifyInstance) {
   app.register(unauthenticatedRoutes)
@@ -12,4 +13,5 @@ export async function appRoutes(app: FastifyInstance) {
   app.register(coupleInvitationsRoutes)
   app.register(couplesRoutes)
   app.register(shoppingListsRoutes)
+  app.register(householdTasksRoutes)
 }
