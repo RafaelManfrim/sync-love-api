@@ -17,4 +17,5 @@ export interface HouseholdTasksRepository {
   ): Promise<HouseholdTask>
 
   softDeleteById(id: number): Promise<void>
+  countByCoupleId(coupleId: number): Promise<number>
 }

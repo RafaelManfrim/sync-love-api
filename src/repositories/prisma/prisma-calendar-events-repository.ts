@@ -57,4 +57,13 @@ export class PrismaCalendarEventsRepository
       where: { id },
     })
   }
+
+  async countByCoupleId(coupleId: number): Promise<number> {
+    const count = await prisma.calendarEvent.count({
+      where: {
+        couple_id: coupleId,
+      },
+    })
+    return count
+  }
 }

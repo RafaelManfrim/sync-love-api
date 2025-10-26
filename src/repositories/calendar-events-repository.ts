@@ -19,4 +19,5 @@ export interface CalendarEventsRepository {
     data: Prisma.CalendarEventUncheckedUpdateInput,
   ): Promise<CalendarEvent>
   deleteById(id: number): Promise<void>
+  countByCoupleId(coupleId: number): Promise<number>
 }

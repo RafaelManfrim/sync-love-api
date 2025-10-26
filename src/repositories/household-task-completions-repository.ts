@@ -19,6 +19,11 @@ export type HouseholdTaskCompletionWithTask = HouseholdTaskCompletion & {
   household_task: HouseholdTask
 }
 
+export type CompletionCountByUser = {
+  completed_by_user_id: number
+  _count: number
+}
+
 export interface HouseholdTaskCompletionsRepository {
   findManyByCoupleIdAndDate(
     coupleId: number,
@@ -44,6 +49,9 @@ export interface HouseholdTaskCompletionsRepository {
 
   findById(id: number): Promise<HouseholdTaskCompletionWithTask | null>
 
-  // [NOVO]
   deleteById(id: number): Promise<void>
+
+  countByCoupleIdGroupedByUser(
+    coupleId: number,
+  ): Promise<CompletionCountByUser[]>
 }

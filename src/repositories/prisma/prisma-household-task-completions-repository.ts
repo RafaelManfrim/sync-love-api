@@ -1,5 +1,6 @@
 import { prisma } from '@lib/prisma'
 import {
+  CompletionCountByUser,
   HouseholdTaskCompletionsRepository,
   HouseholdTaskCompletionWithTask,
   HouseholdTaskCompletionWithUser,
@@ -114,5 +115,28 @@ export class PrismaHouseholdTaskCompletionsRepository
         id,
       },
     })
+  }
+
+  async countByCoupleIdGroupedByUser(
+    coupleId: number,
+  ): Promise<CompletionCountByUser[]> {
+    const summary = await prisma.householdTaskCompletion.groupBy({
+      by: ['completed_by_user_id'],
+      where: {
+        // Filtra pelo casal
+        household_task: {
+          couple_id: coupleId,
+          // Não precisamos filtrar por deleted_at aqui,
+          // pois a conclusão permanece mesmo se a tarefa for deletada
+        },
+      },
+      _count: true, // Conta as ocorrências
+    })
+
+    // Normaliza o retorno
+    return summary.map((item) => ({
+      completed_by_user_id: item.completed_by_user_id,
+      _count: typeof item._count === 'number' ? item._count : item._count,
+    }))
   }
 }

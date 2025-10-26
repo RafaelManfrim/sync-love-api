@@ -11,7 +11,15 @@ export class PrismaCouplesRepository implements CouplesRepository {
     const couple = await prisma.couple.findUnique({
       where: { id },
       include: {
-        User: true, // Inclui os dados dos dois usuários
+        User: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatar_url: true,
+            created_at: true,
+          },
+        }, // Inclui os dados dos dois usuários
         _count: {
           select: {
             ShoppingLists: true, // Conta as listas de compras

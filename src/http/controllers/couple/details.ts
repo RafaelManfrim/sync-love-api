@@ -4,9 +4,9 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 export async function details(request: FastifyRequest, reply: FastifyReply) {
   const getCoupleDetailsUseCase = makeGetCoupleDetailsUseCase()
 
-  const { coupleDetails } = await getCoupleDetailsUseCase.execute({
-    coupleId: request.user.coupleId,
+  const { ...coupleDetails } = await getCoupleDetailsUseCase.execute({
+    userId: request.user.sub,
   })
 
-  return reply.status(200).send({ coupleDetails })
+  return reply.send({ coupleDetails })
 }

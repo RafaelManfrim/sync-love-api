@@ -6,9 +6,12 @@ import { update } from '../controllers/calendar-event/update'
 import { remove } from '../controllers/calendar-event/remove'
 import { createException } from '../controllers/calendar-event/create-exception'
 import { deleteException } from '../controllers/calendar-event/delete-exception'
+import { fetchCategories } from '../controllers/calendar-event/fetch-categories'
 
 export async function calendarEventsRoutes(app: FastifyInstance) {
   app.addHook('onRequest', verifyJWT)
+
+  app.get('/calendar-categories', fetchCategories)
 
   app.post('/calendar-events', create)
   app.get('/calendar-events', fetch)

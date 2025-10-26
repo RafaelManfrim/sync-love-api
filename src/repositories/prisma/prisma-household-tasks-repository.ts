@@ -68,4 +68,14 @@ export class PrismaHouseholdTasksRepository
       },
     })
   }
+
+  async countByCoupleId(coupleId: number): Promise<number> {
+    const count = await prisma.householdTask.count({
+      where: {
+        couple_id: coupleId,
+        deleted_at: null, // Ignora tarefas soft-deletadas
+      },
+    })
+    return count
+  }
 }
