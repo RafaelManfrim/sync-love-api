@@ -41,6 +41,7 @@ model User {
   ShoppingLists    ShoppingList[]
   ShoppingListItem ShoppingListItem[]
   CreatedCalendarEvents CalendarEvent[]
+  CreatedCalendarEventExceptions CalendarEventException[]
   CreatedHouseholdTasks   HouseholdTask[]           @relation("UserWhoCreatedTask")
   CompletedHouseholdTasks HouseholdTaskCompletion[] @relation("UserWhoCompletedTask")
   CreatedHouseholdTaskExceptions HouseholdTaskException[]
@@ -155,6 +156,25 @@ model CalendarEvent {
   couple    Couple                 @relation(fields: [couple_id], references: [id])
   author    User                   @relation(fields: [author_id], references: [id])
   category  CalendarEventCategory? @relation(fields: [category_id], references: [id])
+  exceptions CalendarEventException[]
+}
+
+model CalendarEventException {
+  id                  Int      @id @default(autoincrement())
+  calendar_event_id   Int      // Link para o evento (ex: "Aniversário")
+  
+  // A data/hora exata (UTC) da ocorrência que está sendo cancelada
+  // Ex: "2026-10-25T14:00:00Z"
+  exception_date      DateTime 
+  
+  created_at          DateTime @default(now())
+  created_by_user_id  Int      // Quem cancelou
+
+  calendar_event CalendarEvent @relation(fields: [calendar_event_id], references: [id])
+  created_by     User          @relation(fields: [created_by_user_id], references: [id])
+
+  // Garante que uma ocorrência de evento só possa ser cancelada uma vez
+  @@unique([calendar_event_id, exception_date])
 }
 
 model HouseholdTask {
