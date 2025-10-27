@@ -1,7 +1,9 @@
-import { ShoppingList } from '@prisma/client'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { UnauthorizedError } from './errors/unauthorized-error'
-import { ShoppingListsRepository } from '@/repositories/shopping-lists-repository'
+import {
+  ShoppingListsRepository,
+  ShoppingListWithAveragePrice,
+} from '@/repositories/shopping-lists-repository'
 
 interface GetShoppingListUseCaseRequest {
   listId: number
@@ -9,7 +11,7 @@ interface GetShoppingListUseCaseRequest {
 }
 
 interface GetShoppingListUseCaseResponse {
-  shoppingList: ShoppingList
+  shoppingList: ShoppingListWithAveragePrice
 }
 
 export class GetShoppingListUseCase {

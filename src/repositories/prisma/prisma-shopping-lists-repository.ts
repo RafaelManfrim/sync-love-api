@@ -1,6 +1,9 @@
 import { prisma } from '@/lib/prisma'
 import { Prisma, ShoppingList } from '@prisma/client'
-import { ShoppingListsRepository } from '../shopping-lists-repository'
+import {
+  ShoppingListsRepository,
+  ShoppingListWithAveragePrice,
+} from '../shopping-lists-repository'
 
 export class PrismaShoppingListsRepository implements ShoppingListsRepository {
   async create(
@@ -33,7 +36,7 @@ export class PrismaShoppingListsRepository implements ShoppingListsRepository {
     return shoppingLists
   }
 
-  async findById(id: number): Promise<ShoppingList | null> {
+  async findById(id: number): Promise<ShoppingListWithAveragePrice | null> {
     const shoppingList = await prisma.shoppingList.findUnique({
       where: {
         id,
@@ -46,6 +49,63 @@ export class PrismaShoppingListsRepository implements ShoppingListsRepository {
         },
       },
     })
-    return shoppingList
+
+    if (!shoppingList) {
+      return null
+    }
+
+    // Obter todos os product_ids únicos da lista
+    const productIds = [
+      ...new Set(shoppingList.ShoppingListItem.map((item) => item.product_id)),
+    ]
+
+    // Buscar todos os itens com preços para esses produtos de uma vez
+    const allProductItems = await prisma.shoppingListItem.findMany({
+      where: {
+        product_id: {
+          in: productIds,
+        },
+        unit_price: {
+          not: null,
+        },
+      },
+      select: {
+        product_id: true,
+        unit_price: true,
+      },
+    })
+
+    // Calcular médias por produto
+    const averagePricesByProduct = new Map<number, Prisma.Decimal>()
+
+    productIds.forEach((productId) => {
+      const productItems = allProductItems.filter(
+        (item) => item.product_id === productId,
+      )
+
+      if (productItems.length > 0) {
+        const total = productItems.reduce(
+          (sum, item) => sum + (item.unit_price?.toNumber() || 0),
+          0,
+        )
+        averagePricesByProduct.set(
+          productId,
+          new Prisma.Decimal(total / productItems.length),
+        )
+      }
+    })
+
+    // Adicionar preço médio a cada item
+    const itemsWithAveragePrice = shoppingList.ShoppingListItem.map((item) => {
+      return {
+        ...item,
+        average_price: averagePricesByProduct.get(item.product_id) || null,
+      }
+    })
+
+    return {
+      ...shoppingList,
+      ShoppingListItem: itemsWithAveragePrice,
+    }
   }
 }
