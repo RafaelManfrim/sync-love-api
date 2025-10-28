@@ -3,6 +3,7 @@ import { UsersRepository } from '@repositories/users-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { HouseholdTaskCompletionsRepository } from '@repositories/household-task-completions-repository'
 import { RRule } from 'rrule'
+import { formatDateForRRule } from '@/utils/date-utils'
 
 // --- Tipos de Resposta ---
 type MemberSummary = {
@@ -95,7 +96,7 @@ export class GetHouseholdTasksSummaryUseCase {
       if (task.recurrence_rule) {
         // Tarefa Recorrente
         const rule = RRule.fromString(
-          `DTSTART:${taskStartDate.toISOString().replace(/\.\d{3}Z$/, 'Z')}\n${
+          `DTSTART:${formatDateForRRule(taskStartDate)}\n${
             task.recurrence_rule
           }`,
         )

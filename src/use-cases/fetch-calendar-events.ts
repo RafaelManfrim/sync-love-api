@@ -6,6 +6,7 @@ import { UsersRepository } from '@repositories/users-repository'
 import { ResourceNotFoundError } from './errors/resource-not-found-error'
 import { RRule, RRuleSet } from 'rrule'
 import { CalendarEventExceptionsRepository } from '@/repositories/calendar-event-exceptions-repository'
+import { formatDateForRRule } from '@/utils/date-utils'
 
 // [NOVO] Define a "ocorrência" de um evento
 export type CalendarEventOccurrence = CalendarEventWithDetails & {
@@ -71,9 +72,9 @@ export class FetchCalendarEventsUseCase {
 
         // Define a regra principal de recorrência
         const rule = RRule.fromString(
-          `DTSTART:${event.start_time
-            .toISOString()
-            .replace(/\.\d{3}Z$/, 'Z')}\n${event.recurrence_rule}`,
+          `DTSTART:${formatDateForRRule(event.start_time)}\n${
+            event.recurrence_rule
+          }`,
         )
         rruleSet.rrule(rule)
 

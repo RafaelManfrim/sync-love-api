@@ -8,6 +8,7 @@ import {
 } from '@repositories/household-task-completions-repository'
 import { RRule } from 'rrule'
 import { HouseholdTaskExceptionsRepository } from '@/repositories/household-task-exceptions-repository'
+import { formatDateForRRule } from '@/utils/date-utils'
 
 // Define o formato da resposta: a Tarefa + a Conclusão (se houver)
 export type TaskForDay = HouseholdTask & {
@@ -105,7 +106,7 @@ export class FetchHouseholdTasksByDayUseCase {
       if (task.recurrence_rule) {
         // Tarefa Recorrente
         const rule = RRule.fromString(
-          `DTSTART:${taskStartDate.toISOString().replace(/\.\d{3}Z$/, 'Z')}\n${
+          `DTSTART:${formatDateForRRule(taskStartDate)}\n${
             task.recurrence_rule
           }`,
         )
