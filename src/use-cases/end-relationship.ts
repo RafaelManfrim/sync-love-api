@@ -28,6 +28,7 @@ export class EndRelationshipUseCase {
         where: { id: couple.invite_id },
       })
 
+      // ========== Shopping Lists ==========
       const shoppingLists = await prismaTx.shoppingList.findMany({
         where: { couple_id: coupleId },
         select: { id: true }, // Apenas precisamos dos IDs
@@ -48,6 +49,50 @@ export class EndRelationshipUseCase {
         where: { couple_id: coupleId },
       })
 
+      // ========== Calendar Events ==========
+      const calendarEvents = await prismaTx.calendarEvent.findMany({
+        where: { couple_id: coupleId },
+        select: { id: true },
+      })
+      const calendarEventIds = calendarEvents.map((event) => event.id)
+
+      // Deletar exceções de eventos antes dos eventos
+      await prismaTx.calendarEventException.deleteMany({
+        where: {
+          calendar_event_id: { in: calendarEventIds },
+        },
+      })
+
+      await prismaTx.calendarEvent.deleteMany({
+        where: { couple_id: coupleId },
+      })
+
+      // ========== Household Tasks ==========
+      const householdTasks = await prismaTx.householdTask.findMany({
+        where: { couple_id: coupleId },
+        select: { id: true },
+      })
+      const householdTaskIds = householdTasks.map((task) => task.id)
+
+      // Deletar conclusões de tarefas
+      await prismaTx.householdTaskCompletion.deleteMany({
+        where: {
+          household_task_id: { in: householdTaskIds },
+        },
+      })
+
+      // Deletar exceções de tarefas
+      await prismaTx.householdTaskException.deleteMany({
+        where: {
+          household_task_id: { in: householdTaskIds },
+        },
+      })
+
+      await prismaTx.householdTask.deleteMany({
+        where: { couple_id: coupleId },
+      })
+
+      // ========== Couple ==========
       // Desvincula os usuários do casal
       await prismaTx.user.updateMany({
         where: { couple_id: coupleId },
