@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify'
 import { verifyJWT } from '@http/middlewares/verify-jwt'
 import { create } from '@http/controllers/household-task/create'
+import { fetchAll } from '@http/controllers/household-task/fetch-all'
 import { fetchByDay } from '../controllers/household-task/fetch-by-day'
 import { summary } from '../controllers/household-task/summary'
 import { complete } from '../controllers/household-task/complete'
@@ -15,6 +16,9 @@ export async function householdTasksRoutes(app: FastifyInstance) {
   app.addHook('onRequest', verifyJWT)
 
   app.post('/tasks', create)
+
+  // GET /tasks - busca todas as tarefas do casal
+  app.get('/tasks', fetchAll)
 
   app.get('/tasks/:taskId', getDetails)
 
