@@ -8,7 +8,11 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     title: z.string().min(1),
     description: z.string().nullable().optional(),
     startDate: z.coerce.date(), // 'z.coerce.date()' converte a string JSON para Date
-    recurrenceRule: z.string().nullable().optional(),
+    recurrenceRule: z
+      .string()
+      .nullable()
+      .optional()
+      .transform((val) => (val === 'none' ? null : val)), // Converte 'none' para null
   })
 
   const { title, description, startDate, recurrenceRule } =

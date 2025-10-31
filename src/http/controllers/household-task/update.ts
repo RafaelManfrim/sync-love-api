@@ -14,7 +14,11 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     title: z.string().min(1).optional(),
     description: z.string().nullable().optional(),
     start_date: z.coerce.date().optional(),
-    recurrence_rule: z.string().nullable().optional(),
+    recurrence_rule: z
+      .string()
+      .nullable()
+      .optional()
+      .transform((val) => (val === 'none' ? null : val)), // Converte 'none' para null
   })
 
   const { taskId } = updateTaskParamsSchema.parse(request.params)

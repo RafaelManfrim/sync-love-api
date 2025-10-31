@@ -11,7 +11,11 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     startTime: z.coerce.date(), //
     endTime: z.coerce.date(), //
     isAllDay: z.boolean().default(false), //
-    recurrenceRule: z.string().nullable().optional(), //
+    recurrenceRule: z
+      .string()
+      .nullable()
+      .optional()
+      .transform((val) => (val === 'none' ? null : val)), // Converte 'none' para null
     categoryId: z.number().int().nullable().optional(), //
   })
 

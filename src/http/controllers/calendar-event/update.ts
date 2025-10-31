@@ -16,7 +16,11 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
     start_time: z.coerce.date().optional(),
     end_time: z.coerce.date().optional(),
     is_all_day: z.boolean().optional(),
-    recurrence_rule: z.string().nullable().optional(),
+    recurrence_rule: z
+      .string()
+      .nullable()
+      .optional()
+      .transform((val) => (val === 'none' ? null : val)), // Converte 'none' para null
     category_id: z.number().int().nullable().optional(),
   })
 
