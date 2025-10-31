@@ -81,7 +81,15 @@ export class FetchCalendarEventsUseCase {
         // (No futuro, poderíamos adicionar EXDATEs aqui se tivéssemos exceções)
 
         // 4. Gera as ocorrências dentro da janela de busca
-        const occurrenceDates = rruleSet.between(startDate, endDate)
+        // IMPORTANTE: between() é inclusivo no início e exclusivo no fim
+        // Então precisamos adicionar 1 dia ao endDate para incluir o último dia
+        const adjustedEndDate = new Date(endDate)
+        adjustedEndDate.setDate(adjustedEndDate.getDate() + 1)
+        const occurrenceDates = rruleSet.between(
+          startDate,
+          adjustedEndDate,
+          true,
+        )
 
         for (const date of occurrenceDates) {
           // Ajusta a data para UTC para evitar problemas de fuso

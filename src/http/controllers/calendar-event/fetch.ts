@@ -14,6 +14,11 @@ export async function fetch(request: FastifyRequest, reply: FastifyReply) {
     request.query,
   )
 
+  // Ajusta o endDate para incluir o dia todo (até 23:59:59.999)
+  // Isso resolve o problema de eventos no último dia do mês não aparecerem
+  const adjustedEndDate = new Date(endDate)
+  adjustedEndDate.setUTCHours(23, 59, 59, 999)
+
   const userId = request.user.sub
 
   try {
@@ -22,7 +27,7 @@ export async function fetch(request: FastifyRequest, reply: FastifyReply) {
     const { events } = await fetchCalendarEventsUseCase.execute({
       userId,
       startDate,
-      endDate,
+      endDate: adjustedEndDate,
     })
 
     return reply.status(200).send({ events })
