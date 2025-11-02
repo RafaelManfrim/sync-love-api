@@ -1,5 +1,7 @@
-export class UnauthorizedError extends Error {
+import { AppError } from './app-error'
+
+export class UnauthorizedError extends AppError {
   constructor() {
-    super('Solicitação não autorizada.')
+    super('Solicitação não autorizada.', 'UNAUTHORIZED')
   }
 }

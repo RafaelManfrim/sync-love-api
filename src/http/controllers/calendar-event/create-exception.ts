@@ -35,13 +35,21 @@ export async function createException(
     return reply.status(201).send()
   } catch (error) {
     if (error instanceof CalendarExceptionAlreadyExistsError) {
-      return reply.status(409).send({ message: error.message })
+      return reply
+        .status(409)
+        .send({ message: error.message, code: error.code })
     }
-    if (
-      error instanceof ResourceNotFoundError ||
-      error instanceof UnauthorizedError
-    ) {
-      return reply.status(403).send({ message: error.message })
+
+    if (error instanceof ResourceNotFoundError) {
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code })
+    }
+
+    if (error instanceof UnauthorizedError) {
+      return reply
+        .status(403)
+        .send({ message: error.message, code: error.code })
     }
 
     throw error

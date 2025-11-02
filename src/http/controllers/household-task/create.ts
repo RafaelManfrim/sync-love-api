@@ -33,7 +33,9 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     })
   } catch (error) {
     if (error instanceof ResourceNotFoundError) {
-      return reply.status(404).send({ message: error.message })
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code })
     }
 
     throw error

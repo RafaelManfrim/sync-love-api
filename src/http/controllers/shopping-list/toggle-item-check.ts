@@ -1,3 +1,5 @@
+import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
+import { UnauthorizedError } from '@/use-cases/errors/unauthorized-error'
 import { makeToggleShoppingItemCheckUseCase } from '@/use-cases/factories/make-toggle-shopping-item-check-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
@@ -15,11 +17,21 @@ export async function toggleItemCheck(
 
   const toggleShoppingItemCheckUseCase = makeToggleShoppingItemCheckUseCase()
 
-  await toggleShoppingItemCheckUseCase.execute({
-    listId,
-    shoppingItemId: itemId,
-    coupleId: request.user.coupleId,
-  })
+  try {
+    await toggleShoppingItemCheckUseCase.execute({
+      listId,
+      shoppingItemId: itemId,
+      coupleId: request.user.coupleId,
+    })
 
-  return reply.status(204).send()
+    return reply.status(204).send()
+  } catch (err) {
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message, code: err.code })
+    }
+    if (err instanceof UnauthorizedError) {
+      return reply.status(403).send({ message: err.message, code: err.code })
+    }
+    throw err
+  }
 }

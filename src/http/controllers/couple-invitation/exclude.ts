@@ -19,7 +19,7 @@ export async function exclude(request: FastifyRequest, reply: FastifyReply) {
     })
   } catch (err) {
     if (err instanceof InvitationNotFoundError) {
-      return reply.status(404).send({ message: err.message })
+      return reply.status(404).send({ message: err.message, code: err.code })
     }
 
     throw err

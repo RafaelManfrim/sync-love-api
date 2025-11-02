@@ -22,19 +22,19 @@ export async function decline(request: FastifyRequest, reply: FastifyReply) {
     })
   } catch (err) {
     if (err instanceof InvitationNotFoundError) {
-      return reply.status(404).send({ message: err.message })
+      return reply.status(404).send({ message: err.message, code: err.code })
     }
 
     if (err instanceof UserNotFoundError) {
-      return reply.status(404).send({ message: err.message })
+      return reply.status(404).send({ message: err.message, code: err.code })
     }
 
     if (err instanceof InvitationAlreadyRejectedError) {
-      return reply.status(400).send({ message: err.message })
+      return reply.status(400).send({ message: err.message, code: err.code })
     }
 
     if (err instanceof InvitationAlreadyAcceptedError) {
-      return reply.status(400).send({ message: err.message })
+      return reply.status(400).send({ message: err.message, code: err.code })
     }
 
     throw err

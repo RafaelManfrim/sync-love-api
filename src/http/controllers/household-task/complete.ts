@@ -30,13 +30,21 @@ export async function complete(request: FastifyRequest, reply: FastifyReply) {
     return reply.status(201).send() // 201 Created
   } catch (error) {
     if (error instanceof TaskAlreadyCompletedError) {
-      return reply.status(409).send({ message: error.message }) // 409 Conflict
+      return reply
+        .status(409)
+        .send({ message: error.message, code: error.code }) // 409 Conflict
     }
-    if (
-      error instanceof ResourceNotFoundError ||
-      error instanceof UnauthorizedError
-    ) {
-      return reply.status(403).send({ message: error.message }) // 403 Forbidden/Not Found
+
+    if (error instanceof ResourceNotFoundError) {
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code }) // 404 Not Found
+    }
+
+    if (error instanceof UnauthorizedError) {
+      return reply
+        .status(403)
+        .send({ message: error.message, code: error.code }) // 403 Forbidden
     }
 
     throw error

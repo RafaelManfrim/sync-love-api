@@ -49,11 +49,9 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     return reply.status(201).send()
   } catch (error) {
     if (error instanceof ResourceNotFoundError) {
-      return reply.status(404).send({ message: 'User not found.' })
-    }
-    // Tratamento genérico caso a category_id não exista (erro de Foreign Key)
-    if (error instanceof Error && error.message.includes('foreign key')) {
-      return reply.status(400).send({ message: 'Invalid category_id.' })
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code })
     }
 
     throw error

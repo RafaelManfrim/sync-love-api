@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
 import { makeGetHouseholdTasksSummaryUseCase } from '@use-cases/factories/make-get-household-tasks-summary-use-case'
+import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
 
 export async function summary(request: FastifyRequest, reply: FastifyReply) {
   const summaryQuerySchema = z.object({
@@ -23,10 +24,12 @@ export async function summary(request: FastifyRequest, reply: FastifyReply) {
       month,
     })
 
-    return reply.status(200).send(summary)
+    return reply.send(summary)
   } catch (error) {
-    if (error instanceof Error) {
-      return reply.status(400).send({ message: error.message })
+    if (error instanceof ResourceNotFoundError) {
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code })
     }
     throw error
   }

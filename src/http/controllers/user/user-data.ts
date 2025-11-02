@@ -12,7 +12,7 @@ export async function userData(request: FastifyRequest, reply: FastifyReply) {
     return reply.send({ user: { ...user, password_hash: undefined } })
   } catch (err) {
     if (err instanceof UserNotFoundError) {
-      return reply.status(404).send({ message: err.message })
+      return reply.status(404).send({ message: err.message, code: err.code })
     }
 
     throw err

@@ -34,13 +34,18 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
       data,
     })
 
-    return reply.status(200).send(householdTask)
+    return reply.send(householdTask)
   } catch (error) {
-    if (
-      error instanceof ResourceNotFoundError ||
-      error instanceof UnauthorizedError
-    ) {
-      return reply.status(403).send({ message: error.message }) // 403 Forbidden/Not Found
+    if (error instanceof ResourceNotFoundError) {
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code })
+    }
+
+    if (error instanceof UnauthorizedError) {
+      return reply
+        .status(403)
+        .send({ message: error.message, code: error.code }) // 403 Forbidden/Not Found
     }
 
     throw error

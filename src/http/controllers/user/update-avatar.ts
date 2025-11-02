@@ -1,3 +1,4 @@
+import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
 import { makeUpdateAvatarUseCase } from '@/use-cases/factories/make-update-avatar-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 
@@ -14,10 +15,18 @@ export async function updateAvatar(
 
   const updateAvatarUseCase = makeUpdateAvatarUseCase()
 
-  const { avatarUrl } = await updateAvatarUseCase.execute({
-    userId: request.user.sub,
-    file,
-  })
+  try {
+    const { avatarUrl } = await updateAvatarUseCase.execute({
+      userId: request.user.sub,
+      file,
+    })
 
-  return reply.status(200).send({ avatarUrl })
+    return reply.status(200).send({ avatarUrl })
+  } catch (err) {
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message, code: err.code })
+    }
+
+    throw err
+  }
 }

@@ -39,11 +39,16 @@ export async function update(request: FastifyRequest, reply: FastifyReply) {
 
     return reply.status(200).send(calendarEvent)
   } catch (error) {
-    if (
-      error instanceof ResourceNotFoundError ||
-      error instanceof UnauthorizedError
-    ) {
-      return reply.status(403).send({ message: error.message })
+    if (error instanceof ResourceNotFoundError) {
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code })
+    }
+
+    if (error instanceof UnauthorizedError) {
+      return reply
+        .status(403)
+        .send({ message: error.message, code: error.code })
     }
 
     throw error

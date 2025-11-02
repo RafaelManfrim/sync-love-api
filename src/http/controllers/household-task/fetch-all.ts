@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
-import { PrismaHouseholdTasksRepository } from '@/repositories/prisma/prisma-household-tasks-repository'
+import { makeFetchHouseholdTasksUseCase } from '@/use-cases/factories/make-fetch-household-tasks-use-case'
 
 /**
  * GET /tasks
@@ -8,8 +8,13 @@ import { PrismaHouseholdTasksRepository } from '@/repositories/prisma/prisma-hou
 export async function fetchAll(request: FastifyRequest, reply: FastifyReply) {
   const coupleId = request.user.coupleId
 
-  const tasksRepository = new PrismaHouseholdTasksRepository()
-  const tasks = await tasksRepository.findManyByCoupleId(coupleId)
+  const fetchHouseholdTasksUseCase = makeFetchHouseholdTasksUseCase()
 
-  return reply.status(200).send({ tasks })
+  const { tasks } = await fetchHouseholdTasksUseCase.execute({
+    coupleId,
+  })
+
+  return reply.send({
+    tasks,
+  })
 }

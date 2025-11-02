@@ -33,7 +33,9 @@ export async function fetch(request: FastifyRequest, reply: FastifyReply) {
     return reply.status(200).send({ events })
   } catch (error) {
     if (error instanceof ResourceNotFoundError) {
-      return reply.status(404).send({ message: 'User not found.' })
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code })
     }
 
     throw error

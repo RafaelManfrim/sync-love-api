@@ -26,11 +26,16 @@ export async function deleteCompletion(
 
     return reply.status(204).send() // 204 No Content
   } catch (error) {
-    if (
-      error instanceof ResourceNotFoundError ||
-      error instanceof UnauthorizedError
-    ) {
-      return reply.status(403).send({ message: error.message }) // 403 Forbidden/Not Found
+    if (error instanceof ResourceNotFoundError) {
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code }) // 404 Not Found
+    }
+
+    if (error instanceof UnauthorizedError) {
+      return reply
+        .status(403)
+        .send({ message: error.message, code: error.code }) // 403 Forbidden
     }
 
     throw error

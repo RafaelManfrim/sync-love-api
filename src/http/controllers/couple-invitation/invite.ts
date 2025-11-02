@@ -22,11 +22,11 @@ export async function invite(request: FastifyRequest, reply: FastifyReply) {
     return reply.send({ invite })
   } catch (err) {
     if (err instanceof InviterNotFoundError) {
-      return reply.status(404).send({ message: err.message })
+      return reply.status(404).send({ message: err.message, code: err.code })
     }
 
     if (err instanceof InvitationAlreadyExistsError) {
-      return reply.status(409).send({ message: err.message })
+      return reply.status(409).send({ message: err.message, code: err.code })
     }
 
     throw err

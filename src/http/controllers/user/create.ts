@@ -35,6 +35,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
     if (err instanceof UserAlreadyExistsError) {
       return reply.status(409).send({
         message: err.message,
+        code: err.code,
       })
     }
 

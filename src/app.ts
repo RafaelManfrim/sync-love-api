@@ -7,6 +7,7 @@ import { resolve } from 'node:path'
 
 import { env } from './env'
 import { appRoutes } from './http/routes/routes'
+import { AppError } from './use-cases/errors/app-error'
 
 const app = Fastify({
   logger: true,
@@ -32,7 +33,17 @@ app.setErrorHandler((error, _, reply) => {
     console.error(error)
   }
 
-  return reply.status(500).send({ message: 'Internal server error.' })
+  if (error instanceof AppError) {
+    return reply.status(400).send({
+      message: error.message,
+      code: error.code,
+    })
+  }
+
+  return reply.status(500).send({
+    message: 'Internal server error.',
+    code: 'INTERNAL_SERVER_ERROR',
+  })
 })
 
 export { app }

@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify'
 import { z } from 'zod'
 import { makeFetchHouseholdTasksByDayUseCase } from '@use-cases/factories/make-fetch-household-tasks-by-day-use-case'
+import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
 
 export async function fetchByDay(request: FastifyRequest, reply: FastifyReply) {
   const fetchByDayQuerySchema = z.object({
@@ -25,8 +26,10 @@ export async function fetchByDay(request: FastifyRequest, reply: FastifyReply) {
       tasks,
     })
   } catch (error) {
-    if (error instanceof Error) {
-      return reply.status(400).send({ message: error.message })
+    if (error instanceof ResourceNotFoundError) {
+      return reply
+        .status(404)
+        .send({ message: error.message, code: error.code })
     }
     throw error
   }

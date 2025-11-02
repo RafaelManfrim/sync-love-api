@@ -1,5 +1,7 @@
-export class InvitationNotFoundError extends Error {
+import { AppError } from './app-error'
+
+export class InvitationNotFoundError extends AppError {
   constructor() {
-    super('O convite não foi encontrado.')
+    super('O convite não foi encontrado.', 'INVITATION_NOT_FOUND')
   }
 }

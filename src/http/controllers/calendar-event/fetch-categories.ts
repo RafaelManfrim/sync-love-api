@@ -9,5 +9,5 @@ export async function fetchCategories(
 
   const { categories } = await fetchCategoriesUseCase.execute()
 
-  return reply.status(200).send({ categories })
+  return reply.send({ categories })
 }

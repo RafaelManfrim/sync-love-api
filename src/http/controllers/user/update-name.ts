@@ -1,3 +1,4 @@
+import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
 import { makeUpdateNameUseCase } from '@/use-cases/factories/make-update-name-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
@@ -11,10 +12,16 @@ export async function updateName(request: FastifyRequest, reply: FastifyReply) {
 
   const updateNameUseCase = makeUpdateNameUseCase()
 
-  await updateNameUseCase.execute({
-    userId: request.user.sub,
-    newName,
-  })
+  try {
+    await updateNameUseCase.execute({
+      userId: request.user.sub,
+      newName,
+    })
+  } catch (err) {
+    if (err instanceof ResourceNotFoundError) {
+      return reply.status(404).send({ message: err.message, code: err.code })
+    }
 
-  return reply.status(204).send()
+    throw err
+  }
 }

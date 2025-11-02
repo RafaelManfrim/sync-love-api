@@ -1,3 +1,5 @@
+import { InvalidCredentialsError } from '@/use-cases/errors/invalid-credentials-error'
+import { ResourceNotFoundError } from '@/use-cases/errors/resource-not-found-error'
 import { makeUpdatePasswordUseCase } from '@/use-cases/factories/make-update-password-use-case'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { z } from 'zod'
@@ -19,11 +21,22 @@ export async function updatePassword(
 
   const updatePasswordUseCase = makeUpdatePasswordUseCase()
 
-  await updatePasswordUseCase.execute({
-    userId: request.user.sub,
-    oldPassword,
-    newPassword,
-  })
+  try {
+    await updatePasswordUseCase.execute({
+      userId: request.user.sub,
+      oldPassword,
+      newPassword,
+    })
 
-  return reply.status(204).send()
+    return reply.status(204).send()
+  } catch (err) {
+    if (
+      err instanceof ResourceNotFoundError ||
+      err instanceof InvalidCredentialsError
+    ) {
+      return reply.status(400).send({ message: err.message, code: err.code })
+    }
+
+    throw err
+  }
 }

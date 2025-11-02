@@ -27,15 +27,15 @@ export async function refreshToken(
     return reply.send({ access, refresh })
   } catch (err) {
     if (err instanceof UserNotFoundError) {
-      return reply.status(404).send({ message: err.message })
+      return reply.status(404).send({ message: err.message, code: err.code })
     }
 
     if (err instanceof RefreshTokenNotFoundError) {
-      return reply.status(404).send({ message: err.message })
+      return reply.status(404).send({ message: err.message, code: err.code })
     }
 
     if (err instanceof RefreshTokenExpiredError) {
-      return reply.status(400).send({ message: err.message })
+      return reply.status(400).send({ message: err.message, code: err.code })
     }
 
     throw err

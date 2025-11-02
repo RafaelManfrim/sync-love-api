@@ -14,7 +14,7 @@ export async function list(request: FastifyRequest, reply: FastifyReply) {
     return reply.send({ recievedInvites, sentInvites })
   } catch (err) {
     if (err instanceof UserNotFoundError) {
-      return reply.status(404).send({ message: err.message })
+      return reply.status(404).send({ message: err.message, code: err.code })
     }
 
     throw err
