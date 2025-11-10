@@ -8,18 +8,21 @@ import { toggleItemCheck } from '../controllers/shopping-list/toggle-item-check'
 import { close } from '../controllers/shopping-list/close'
 import { getById } from '../controllers/shopping-list/get-by-id'
 import { listProducts } from '../controllers/shopping-list/list-products'
+import { update } from '../controllers/shopping-list/update'
+import { remove } from '../controllers/shopping-list/remove'
 
 export async function shoppingListsRoutes(app: FastifyInstance) {
   app.addHook('onRequest', verifyJWT)
 
   app.get('/shopping-lists', listByCouple)
   app.post('/shopping-lists', create)
-
-  app.get('/shopping-lists/products', listProducts)
-
   app.get('/shopping-lists/:listId', getById)
+  app.put('/shopping-lists/:listId', update)
+  app.delete('/shopping-lists/:listId', remove)
 
   app.post('/shopping-lists/:listId/items', addItem)
   app.patch('/shopping-lists/:listId/items/:itemId/toggle', toggleItemCheck)
   app.post('/shopping-lists/:listId/close', close)
+
+  app.get('/shopping-lists/products', listProducts)
 }

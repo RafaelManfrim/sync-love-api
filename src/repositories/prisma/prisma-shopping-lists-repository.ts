@@ -108,4 +108,27 @@ export class PrismaShoppingListsRepository implements ShoppingListsRepository {
       ShoppingListItem: itemsWithAveragePrice,
     }
   }
+
+  async update(
+    id: number,
+    data: Prisma.ShoppingListUncheckedUpdateInput,
+  ): Promise<ShoppingList> {
+    const shoppingList = await prisma.shoppingList.update({
+      where: {
+        id,
+      },
+      data,
+    })
+
+    return shoppingList
+  }
+
+  async deleteById(id: number): Promise<void> {
+    await prisma.$transaction([
+      // Deleta todos os ShoppingListItem
+      prisma.shoppingListItem.deleteMany({ where: { shopping_list_id: id } }),
+      // Deleta a ShoppingList
+      prisma.shoppingList.delete({ where: { id } }),
+    ])
+  }
 }
