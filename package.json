@@ -9,7 +9,16 @@
     "build": "tsup src --out-dir build",
     "migration": "npx prisma migrate dev --name",
     "migration-deploy": "npx prisma migrate deploy",
-    "studio": "npx prisma studio"
+    "studio": "npx prisma studio",
+    "test:create-prisma-environment": "npm link ./prisma/vitest-environment-prisma",
+    "test:install-prisma-environment": "npm link vitest-environment-prisma",
+    "test": "vitest run --dir src/use-cases",
+    "test-watch": "vitest --dir src/use-cases",
+    "pretest:e2e": "run-s test:create-prisma-environment test:install-prisma-environment",
+    "test:e2e": "vitest run --dir src/http",
+    "test:e2e:watch": "vitest --dir src/http",
+    "test-coverage": "vitest run --coverage",
+    "test-ui": "vitest --ui"
   },
   "author": "",
   "license": "ISC",

@@ -28,14 +28,17 @@ export class InMemoryShoppingListsRepository
   }> = []
 
   async create(data: Prisma.ShoppingListUncheckedCreateInput) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dataWithAlias = data as any
+
     const list: ShoppingList = {
       id: this.items.length + 1,
       name: data.name ?? null,
       couple_id: data.couple_id,
-      author_id: data.author_id,
+      author_id: dataWithAlias.created_by_user_id || data.author_id,
       created_at: new Date(),
       updated_at: new Date(),
-      closed_at: null,
+      closed_at: data.closed_at ? new Date(data.closed_at as Date) : null,
     }
 
     this.items.push(list)

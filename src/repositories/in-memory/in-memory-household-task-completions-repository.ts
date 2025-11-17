@@ -73,11 +73,14 @@ export class InMemoryHouseholdTaskCompletionsRepository
   }
 
   async create(data: Prisma.HouseholdTaskCompletionUncheckedCreateInput) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dataWithAlias = data as any
+
     const completion: HouseholdTaskCompletion = {
       id: this.items.length + 1,
       household_task_id: data.household_task_id,
       completed_by_user_id: data.completed_by_user_id,
-      task_due_date: new Date(data.task_due_date),
+      task_due_date: new Date(dataWithAlias.due_date || data.task_due_date),
       completed_at: new Date(),
     }
 
