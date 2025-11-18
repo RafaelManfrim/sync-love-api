@@ -87,14 +87,14 @@ export class FetchHouseholdTasksByDayUseCase {
     for (const task of allTasksForCouple) {
       let isDue = false
 
-      // Trata a data de início da tarefa como UTC
+      // Trata a data de início da tarefa como UTC (apenas dia, sem horas)
       const taskStartDate = new Date(
         Date.UTC(
           task.start_date.getUTCFullYear(),
           task.start_date.getUTCMonth(),
           task.start_date.getUTCDate(),
-          task.start_date.getUTCHours(),
-          task.start_date.getUTCMinutes(),
+          0, // Zera as horas para comparação correta
+          0, // Zera os minutos
         ),
       )
 
@@ -112,7 +112,7 @@ export class FetchHouseholdTasksByDayUseCase {
         )
 
         // Verifica se a regra gera uma ocorrência dentro do dia consultado
-        const occurrences = rule.between(queryDateStart, queryDateEnd)
+        const occurrences = rule.between(queryDateStart, queryDateEnd, true) // true = inclusive
         isDue = occurrences.length > 0
       } else {
         // Tarefa Única (recurrence_rule é null)

@@ -16,7 +16,7 @@ export async function create(request: FastifyRequest, reply: FastifyReply) {
       .nullable()
       .optional()
       .transform((val) => (val === 'none' ? null : val)), // Converte 'none' para null
-    categoryId: z.number().int().nullable().optional(), //
+    categoryId: z.number().int().nullable().optional(),
   })
 
   const {

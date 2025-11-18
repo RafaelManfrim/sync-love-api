@@ -8,6 +8,7 @@ import { resolve } from 'node:path'
 import { env } from './env'
 import { appRoutes } from './http/routes/routes'
 import { AppError } from './use-cases/errors/app-error'
+import { ZodError } from 'zod'
 
 const app = Fastify({
   logger: true,
@@ -37,6 +38,14 @@ app.setErrorHandler((error, _, reply) => {
     return reply.status(400).send({
       message: error.message,
       code: error.code,
+    })
+  }
+
+  if (error instanceof ZodError) {
+    return reply.status(400).send({
+      message: 'Validation error.',
+      issues: error.errors,
+      code: 'VALIDATION_ERROR',
     })
   }
 

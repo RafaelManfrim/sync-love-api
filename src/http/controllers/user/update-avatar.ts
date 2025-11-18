@@ -10,7 +10,9 @@ export async function updateAvatar(
   const file = await request.file()
 
   if (!file) {
-    return reply.status(400).send({ message: 'Nenhum arquivo enviado.' })
+    return reply
+      .status(400)
+      .send({ message: 'Nenhum arquivo enviado.', code: 'NO_FILE_UPLOADED' })
   }
 
   const updateAvatarUseCase = makeUpdateAvatarUseCase()

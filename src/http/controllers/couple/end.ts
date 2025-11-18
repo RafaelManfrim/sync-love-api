@@ -5,7 +5,13 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 export async function end(request: FastifyRequest, reply: FastifyReply) {
   const endRelationshipUseCase = makeEndRelationshipUseCase()
 
+  const coupleId = request.user.coupleId
+
   try {
+    if (!coupleId) {
+      throw new ResourceNotFoundError()
+    }
+
     await endRelationshipUseCase.execute({
       coupleId: request.user.coupleId,
     })
