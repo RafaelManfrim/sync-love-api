@@ -9,6 +9,10 @@ import { householdTasksRoutes } from './household-tasks.routes'
 import { calendarEventsRoutes } from './calendar-events.routes'
 
 export async function appRoutes(app: FastifyInstance) {
+  app.get('/health', async () => {
+    return { status: 'ok' }
+  })
+
   app.register(unauthenticatedRoutes)
   app.register(usersRoutes)
   app.register(coupleInvitationsRoutes)
